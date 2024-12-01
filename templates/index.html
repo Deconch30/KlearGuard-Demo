@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>KlearGuard AI Demo</title>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Logo" style="width: 150px;">
+
+        <h1>KlearGuard AI Demo</h1>
+    </div>
+    <div class="container">
+        <form id="demoForm">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="userText">Text for Bias Check:</label>
+            <textarea id="userText" name="text" required></textarea>
+            <button type="submit">Analyze</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
