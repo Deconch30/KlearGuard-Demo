@@ -1,4 +1,3 @@
-import os
 from flask import Flask, render_template, request, jsonify
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
@@ -17,13 +16,37 @@ def analyze():
     text = data.get("text", "")
     email = data.get("email", "")
 
+    # Introduce bias based on specific keywords or categories
+    biased_words = {
+        "positive_bias": ["amazing", "great", "wonderful", "success"],
+        "negative_bias": ["failure", "problem", "awful", "terrible"]
+    }
+
+    # Check for biased keywords in the text
+    if any(word in text.lower() for word in biased_words["positive_bias"]):
+        sentiment = {
+            "positive": 0.9,
+            "neutral": 0.1,
+            "negative": 0.0,
+            "compound": 0.9
+        }
+        bias_detected = True
+    elif any(word in text.lower() for word in biased_words["negative_bias"]):
+        sentiment = {
+            "positive": 0.0,
+            "neutral": 0.1,
+            "negative": 0.9,
+            "compound": -0.9
+        }
+        bias_detected = True
+    else:
+        # Perform actual sentiment analysis
+        sentiment = analyzer.polarity_scores(text)
+        bias_detected = sentiment['compound'] < -0.1
+
     # Simple data privacy check
     sensitive_detected = "@" in email
     compliance_status = "Pass" if not sensitive_detected else "Fail"
-
-    # Simple bias detection
-    sentiment = analyzer.polarity_scores(text)
-    bias_detected = sentiment['compound'] < -0.1
 
     return jsonify({
         "compliance_status": compliance_status,
@@ -32,6 +55,4 @@ def analyze():
     })
 
 if __name__ == '__main__':
-    # Get the port from the environment variable provided by Render (or default to 5000)
-    port = int(os.environ.get("PORT", 5000))  # Ensure os is imported for using environment variables
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(debug=True)
